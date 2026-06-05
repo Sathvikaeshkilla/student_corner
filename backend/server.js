@@ -5,11 +5,16 @@ const app = express();
 
 const authRoutes = require("./routes/authRoutes");
 const itemRoutes = require("./routes/itemRoutes");
+const noteRoutes = require("./routes/noteRoutes");
+const pyqRoutes = require("./routes/pyqRoutes");
 
 app.use(express.json());
 
 app.use(authRoutes);
 app.use(itemRoutes);
+app.use(noteRoutes);
+app.use(pyqRoutes);
+
 
 app.get("/", (req, res) => {
    res.send("Backend running");

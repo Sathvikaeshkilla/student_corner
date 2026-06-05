@@ -31,12 +31,30 @@ const createItem = async (req, res) => {
 //get items
 const getItems = async (req, res) => {
    try {
-        const items=await Item.find({status:"available"})
-        res.send(items);
+
+      const { type,condition } = req.query;
+      const filter = {
+         status: "available"
+      };
+
+      if (type) {
+         filter.type = type;
+      }
+      if(condition){
+         filter.condition=condition;
+      }
+
+      const items = await Item.find(filter);
+
+      res.send(items);
+
    }
    catch(error){
-    console.log(error);
-    res.send("Error fetching items");
+
+      console.log(error);
+
+      res.send("Error fetching items");
+
    }
 }
 

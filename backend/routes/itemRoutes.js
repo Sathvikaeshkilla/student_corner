@@ -10,7 +10,7 @@ router.get("/items", getItems);
 router.get("/my-items", authMiddleware, getMyItems);
 router.delete("/items/:id",authMiddleware,deleteItem);
 router.patch("/items/:id/sold",authMiddleware,markItemSold);
-router.get("/item/:id",getItemById);
+router.get("/items/:id",getItemById);
 router.patch("/items/:id", authMiddleware, editItem);
 module.exports = router;
 
