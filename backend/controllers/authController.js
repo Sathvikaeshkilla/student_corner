@@ -76,7 +76,28 @@ const login = async (req, res) => {
 
 };
 
+
+const getProfile = async (req, res) => {
+   try {
+
+      const user = await User.findById(req.userId);
+
+      if (!user) {
+         return res.send("User not found");
+      }
+
+      res.send(user);
+
+   } catch (error) {
+
+      console.log(error);
+      res.send("Error fetching profile");
+
+   }
+};
+
 module.exports = {
    signup,
-   login
+   login,
+   getProfile
 };
