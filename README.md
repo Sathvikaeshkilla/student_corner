@@ -198,18 +198,6 @@ npm run dev
 
 ---
 
-# Screenshots
-
-
-* Home Page
-* Marketplace
-* Notes Repository
-* PYQ Repository
-* Chat Interface
-* Item Details Page
-* Upload Pages
-
----
 
 # Future Enhancements
 
