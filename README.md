@@ -203,9 +203,7 @@ npm run dev
 
 * NIT Warangal Email Verification
 * OTP-Based Account Verification
-* PDF Preview Thumbnails
 * Real-Time Notifications
-* Admin Moderation Panel
 * Advanced Search & Recommendations
 * College-Specific Communities
 
