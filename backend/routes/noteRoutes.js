@@ -1,12 +1,17 @@
 const express = require("express");
-
+const upload = require("../middleware/upload");
 const router = express.Router();
 
 const authMiddleware = require("../middleware/authMiddleware");
 
 const { uploadNote,getNotes,getNoteById,getMyNotes,deleteNote } = require("../controllers/noteController");
 
-router.post("/notes", authMiddleware, uploadNote);
+router.post(
+  "/notes",
+  authMiddleware,
+  upload.single("file"),
+  uploadNote
+);
 router.get("/notes",getNotes);
 router.get("/notes/:id",getNoteById);
 router.get("/my-notes", authMiddleware,getMyNotes);

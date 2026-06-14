@@ -1,33 +1,68 @@
 const Item = require("../models/Item");
-
+const cloudinary = require("../config/cloudinary");
+const streamifier = require("streamifier");
 //create item
 
 const createItem = async (req, res) => {
+  try {
+    const {
+      title,
+      description,
+      price,
+      type,
+      condition,
+    } = req.body;
 
-   try {
-    const { title, description, price, type, condition } = req.body;
-    if(type==="sell" &&!price){
-        return res.send("Price is required for selling items");
+    if (type === "sell" && !price) {
+      return res
+        .status(400)
+        .send("Price is required for selling items");
     }
-    const item= new Item({
-        title,
-        description,
-        price,
-        type,
-        condition,
-        owner:req.userId,
-    })
+
+    if (!req.file) {
+      return res
+        .status(400)
+        .send("Item image is required");
+    }
+
+    const uploadImage = () =>
+      new Promise((resolve, reject) => {
+        const stream =
+          cloudinary.uploader.upload_stream(
+            {
+              folder: "student-corner-items",
+            },
+            (error, result) => {
+              if (error) reject(error);
+              else resolve(result);
+            }
+          );
+
+        streamifier
+          .createReadStream(req.file.buffer)
+          .pipe(stream);
+      });
+
+    const result = await uploadImage();
+
+    const item = new Item({
+      title,
+      description,
+      price,
+      type,
+      condition,
+      imageUrl: result.secure_url,
+      owner: req.userId,
+    });
+
     await item.save();
-    res.send("Item created succesfully");
-   }
-   catch(error){
+
+    res.status(201).send(item);
+  } catch (error) {
     console.log(error);
-    res.send("Error creating item");
-   }
+    res.status(500).send("Error creating item");
+  }
 };
-
-
-
 //get items
 const getItems = async (req, res) => {
    try {
@@ -46,14 +81,14 @@ const getItems = async (req, res) => {
 
       const items = await Item.find(filter);
 
-      res.send(items);
+      res.status(200).send(items);
 
    }
    catch(error){
 
       console.log(error);
 
-      res.send("Error fetching items");
+      res.status(500).send("Error fetching items");
 
    }
 }
@@ -68,14 +103,14 @@ const getMyItems = async (req, res) => {
          owner: req.userId
       });
 
-      res.send(items);
+      res.status(200).send(items);
 
    }
    catch(error){
 
       console.log(error);
 
-      res.send("Error fetching your items");
+      res.status(500).send("Error fetching your items");
 
    }
 };
@@ -86,17 +121,17 @@ const deleteItem = async (req,res)=>{
    try{
     const item = await Item.findById(req.params.id);
     if(!item){
-        return res.send("Item doesnot exist");
+        return res.status(404).send("Item doesnot exist");
     }
     if(item.owner.toString()!==req.userId){
-        return res.send("This item doesnot belong to you ");
+        return res.status(403).send("This item doesnot belong to you ");
     }
     await item.deleteOne();
-    res.send("Item deleted succesfully");}
+    res.status(200).send("Item deleted succesfully");}
 catch(error) {
  console.log(error);
 
-      res.send("Error deleting item");
+      res.status(500).send("Error deleting item");
    }
 
 } 
@@ -112,23 +147,23 @@ const markItemSold = async (req, res) => {
 
       // check exists
 if(!item){
-return res.send("Item doesnot exist");
+return res.status(404).send("Item doesnot exist");
 }
       // check owner
 if(item.owner.toString()!=req.userId){
-   return res.send("This item doesnot belong to you ");
+   return res.status(403).send("This item doesnot belong to you ");
 }
       // update status
 item.status="sold";
       // save
 await item.save();
-return res.send("Item marked as sold");
+return res.status(200).send("Item marked as sold");
       // response
 
    } catch(error) {
  console.log(error);
 
-      res.send("Error marking item as sold");
+      res.status(500).send("Error marking item as sold");
    }
 }
 
@@ -139,16 +174,16 @@ const getItemById = async (req, res) => {
       const item = await Item.findById(req.params.id);
 
       if(!item){
-         return res.send("Item does not exist");
+         return res.status(404).send("Item does not exist");
       }
 
-      res.send(item);
+      res.status(200).send(item);
 
    } catch(error){
 
       console.log(error);
 
-      res.send("Error fetching item");
+      res.status(500).send("Error fetching item");
    }
 
 
@@ -161,11 +196,11 @@ const editItem = async (req, res) => {
       const item = await Item.findById(req.params.id);
 
       if (!item) {
-         return res.send("Item does not exist");
+         return res.status(404).send("Item does not exist");
       }
 
       if (item.owner.toString() !== req.userId) {
-         return res.send("This item does not belong to you");
+         return res.status(403).send("This item does not belong to you");
       }
 
       const { title, description, price, condition } = req.body;
@@ -177,13 +212,13 @@ const editItem = async (req, res) => {
 
       await item.save();
 
-      res.send("Item updated successfully");
+      res.status(200).send("Item updated successfully");
 
 
    } catch (error) {
 
       console.log(error);
-      res.send("Error updating item");
+      res.status(500).send("Error updating item");
 
    }
 };

@@ -27,6 +27,10 @@ const itemSchema = new mongoose.Schema(
    price: {
       type: Number
    },
+   imageUrl: {
+   type: String,
+   required: true
+},
 
    status: {
       type: String,

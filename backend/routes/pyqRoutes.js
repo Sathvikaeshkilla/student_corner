@@ -1,3 +1,4 @@
+const upload = require("../middleware/upload");
 
 const express = require("express");
 
@@ -10,7 +11,12 @@ const { uploadPYQ,getPYQs,getPYQById,getMyPYQs,deletePYQ } = require("../control
 
 
 
-router.post("/pyqs", authMiddleware, uploadPYQ);
+router.post(
+  "/pyqs",
+  authMiddleware,
+  upload.single("file"),
+  uploadPYQ
+);
 
 router.get("/pyqs", getPYQs);
 

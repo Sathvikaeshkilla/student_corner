@@ -2,10 +2,19 @@ const express = require("express");
 
 const router = express.Router();
 
-const { createItem ,getItems,getMyItems,deleteItem,markItemSold,getItemById,editItem} = require("../controllers/itemController");
-const authMiddleware = require("../middleware/authMiddleware");
+const {
+  createItem,
+  getItems,
+  getMyItems,
+  deleteItem,
+  markItemSold,
+  getItemById,
+  editItem,
+} = require("../controllers/itemController");
 
-router.post("/items", authMiddleware, createItem);
+const authMiddleware = require("../middleware/authMiddleware");
+const upload = require("../middleware/upload");
+router.post("/items", authMiddleware, upload.single("image"), createItem);
 router.get("/items", getItems);
 router.get("/my-items", authMiddleware, getMyItems);
 router.delete("/items/:id",authMiddleware,deleteItem);

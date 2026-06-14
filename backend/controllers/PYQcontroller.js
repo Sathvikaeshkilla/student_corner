@@ -2,43 +2,63 @@ const PYQ = require("../models/PYQ");
 
 
 // Upload PYQ
+const cloudinary = require("../config/cloudinary");
+const streamifier = require("streamifier");
+
 const uploadPYQ = async (req, res) => {
-   try {
+  try {
+    const {
+      title,
+      description,
+      subject,
+      branch,
+      year,
+      examType,
+    } = req.body;
 
-      const {
-         title,
-         description,
-         subject,
-         branch,
-         year,
-         examType,
-         fileUrl
-      } = req.body;
+    if (!req.file) {
+      return res.status(400).send("PDF file is required");
+    }
 
-      const pyq = new PYQ({
-         title,
-         description,
-         subject,
-         branch,
-         year,
-         examType,
-         uploadedBy: req.userId,
-         fileUrl
+    const uploadFile = () =>
+      new Promise((resolve, reject) => {
+        const stream = cloudinary.uploader.upload_stream(
+          {
+            resource_type: "auto",
+            folder: "student-corner-pyqs",
+          },
+          (error, result) => {
+            if (error) reject(error);
+            else resolve(result);
+          }
+        );
+
+        streamifier
+          .createReadStream(req.file.buffer)
+          .pipe(stream);
       });
 
-      await pyq.save();
+    const result = await uploadFile();
 
-      res.send("PYQ uploaded successfully");
+    const pyq = new PYQ({
+      title,
+      description,
+      subject,
+      branch,
+      year,
+      examType,
+      uploadedBy: req.userId,
+      fileUrl: result.secure_url,
+    });
 
-   } catch (error) {
+    await pyq.save();
 
-      console.log(error);
-
-      res.send("Error uploading PYQ");
-
-   }
+    res.send("PYQ uploaded successfully");
+  } catch (error) {
+    console.log(error);
+    res.status(500).send("Error uploading PYQ");
+  }
 };
-
 
 // Get all PYQs
 const getPYQs = async (req, res) => {

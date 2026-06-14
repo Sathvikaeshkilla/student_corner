@@ -1,38 +1,62 @@
 const Note = require("../models/Note");
 
+
+const cloudinary = require("../config/cloudinary");
+const streamifier = require("streamifier");
+
 const uploadNote = async (req, res) => {
-   try {
+  try {
+    const {
+      title,
+      description,
+      subject,
+      branch,
+    } = req.body;
 
-      const {
-         title,
-         description,
-         subject,
-         branch,
-         fileUrl
-      } = req.body;
+    if (!req.file) {
+      return res
+        .status(400)
+        .send("PDF file is required");
+    }
 
-      const note = new Note({
-         title,
-         description,
-         subject,
-         branch,
-         uploadedBy: req.userId,
-         fileUrl
+    const uploadFile = () =>
+      new Promise((resolve, reject) => {
+        const stream =
+          cloudinary.uploader.upload_stream(
+            {
+              resource_type: "auto",
+              folder: "student-corner-notes",
+            },
+            (error, result) => {
+              if (error) reject(error);
+              else resolve(result);
+            }
+          );
+
+        streamifier
+          .createReadStream(req.file.buffer)
+          .pipe(stream);
       });
 
-      await note.save();
+    const result = await uploadFile();
 
-      res.send("Note uploaded successfully");
+    const note = new Note({
+      title,
+      description,
+      subject,
+      branch,
+      uploadedBy: req.userId,
+      fileUrl: result.secure_url,
+    });
 
-   } catch (error) {
+    await note.save();
 
-      console.log(error);
-
-      res.send("Error uploading note");
-
-   }
+    res.send("Note uploaded successfully");
+  } catch (error) {
+    console.log(error);
+    res.status(500).send("Error uploading note");
+  }
 };
-
 
 
 const getNotes = async (req,res)=>{
