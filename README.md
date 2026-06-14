@@ -243,7 +243,7 @@ Institutional email verification and OTP-based authentication are planned future
 
 # Author
 
-**Sathvika Eshkilla **
+Sathvika Eshkilla 
 
 B.Tech Computer Science and Engineering
 
