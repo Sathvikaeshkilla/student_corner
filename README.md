@@ -155,7 +155,7 @@ CLOUDINARY_API_SECRET=your_api_secret
 Start Backend:
 
 ```bash
-npm start
+node server.js
 ```
 
 ## Frontend Setup
