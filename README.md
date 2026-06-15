@@ -13,7 +13,7 @@ Many buy/sell requests are scattered across WhatsApp groups:
 * Bicycle for sale, DM me
 * Calculator available, DM me
 * Looking for a lab coat
-* Anyone selling a monitor?
+  
 
 These messages quickly get buried in crowded group chats, making it difficult for both buyers and sellers to connect efficiently.
 
